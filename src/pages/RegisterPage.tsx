@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../api";
+import { registerUser, sendMail } from "../api";
 import {
   Container,
   Paper,
@@ -26,8 +26,17 @@ export const RegisterPage: React.FC = () => {
 
     try {
       const res = await registerUser(name, email, password);
+
       if (res.id) {
         alert("Account successfully created!");
+        sendMail(
+          email,
+          "Welcome to Movie App 🎬",
+          `Hi ${name}, your account has been successfully created!`
+        )
+          .then(() => console.log("Welcome email sent"))
+          .catch((err) => console.error("Email failed:", err));
+
         navigate("/login");
       } else {
         alert(res.message || "Registration failed");

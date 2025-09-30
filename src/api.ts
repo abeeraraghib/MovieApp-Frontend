@@ -43,6 +43,12 @@ export const addMovie = async (movie: { title: string; posterUrl: string; genre:
   return res.json();
 };
 
+export const fetchMoviesByGenre = async (genre: string) => {
+  const res = await fetch(`${BASE_URL}/movies/genres/${encodeURIComponent(genre)}`);
+  return res.json();
+};
+
+
 export const updateMovie = async (id: number, movie: { title?: string; posterUrl?: string; genre?: string; releaseYear?: number; description?: string }) => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${BASE_URL}/movies/update/${id}`, {
@@ -133,5 +139,25 @@ export const removeFavorite = async (userId: number, movieId: number) => {
     body: JSON.stringify({ userId, movieId }),
   });
   if (!res.ok) throw new Error("Failed to remove favorite");
+  return res.json();
+};
+
+export const getAllFavorites = async () => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${BASE_URL}/favorites`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch all favorites");
+  return res.json();
+};
+
+// ---------- Mail ----------
+export const sendMail = async (to: string, subject: string, text: string) => {
+  const res = await fetch(`${BASE_URL}/mail/send`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ to, subject, text }),
+  });
+  if (!res.ok) throw new Error("Failed to send email");
   return res.json();
 };

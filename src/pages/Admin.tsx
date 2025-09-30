@@ -4,6 +4,7 @@ import {
   Typography,
   TextField,
   Button,
+  IconButton,
   Card,
   CardContent,
   CardMedia,
@@ -32,7 +33,7 @@ import {
   deleteUser,
 } from "../api";
 import { useNavigate } from "react-router-dom";
-
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 interface Movie {
   id: number;
   title: string;
@@ -191,6 +192,10 @@ const AdminPage: React.FC = () => {
       >
         Admin Dashboard
       </Typography>
+
+      <IconButton onClick={() => navigate(-1)} sx={{ color: "white" }}>
+        <KeyboardBackspaceIcon />
+      </IconButton>
 
       <Tabs
         value={tab}

@@ -8,8 +8,10 @@ import {
   Stack,
   Button,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { fetchFavoritesByUser, removeFavorite } from "../api";
 
 interface Movie {
@@ -19,24 +21,23 @@ interface Movie {
   posterUrl: string;
 }
 
-interface Favorite {
-  id: number;
-  user: { id: number; name: string; email: string };
-  movie: Movie;
-}
-
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [favorites, setFavorites] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { userId } = useParams();
+  const { userId } = useParams<{ userId: string }>();
 
+  // Current logged-in user ID from localStorage
+  const currentUserId = Number(localStorage.getItem("userId"));
+
+  // Load favorites from backend
   const loadFavorites = async () => {
-    if (!userId) return;
+    const idToFetch = userId ? Number(userId) : currentUserId;
+    if (!idToFetch) return;
+
     setLoading(true);
     try {
-      const data = await fetchFavoritesByUser(Number(userId));
-      console.log("Favorites API response:", data);
+      const data: Movie[] = await fetchFavoritesByUser(idToFetch);
       setFavorites(data);
     } catch (err) {
       console.error(err);
@@ -50,14 +51,20 @@ export default function FavoritesPage() {
     loadFavorites();
   }, [userId]);
 
+  // Remove a favorite with optimistic UI update
   const handleRemoveFavorite = async (movieId: number) => {
-    if (!userId) return;
+    const idToModify = userId ? Number(userId) : currentUserId;
+    if (!idToModify) return;
+
+    // Optimistic update
+    setFavorites((prev) => prev.filter((movie) => movie.id !== movieId));
+
     try {
-      await removeFavorite(Number(userId), movieId);
-      loadFavorites();
+      await removeFavorite(idToModify, movieId);
     } catch (err) {
       console.error(err);
       alert("Failed to remove favorite");
+      loadFavorites(); // fallback if API fails
     }
   };
 
@@ -70,38 +77,53 @@ export default function FavoritesPage() {
 
   return (
     <Container sx={{ mt: 8 }}>
-      <Typography variant="h4" gutterBottom>
-        Favorites of User {userId}
-      </Typography>
+      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+        <IconButton onClick={() => navigate(-1)} sx={{ color: "white" }}>
+          <KeyboardBackspaceIcon />
+        </IconButton>
+        <Typography color="white" variant="h4">
+          {userId ? `Favorites of User ${userId}` : "My Favorites"}
+        </Typography>
+      </Stack>
+
       {favorites.length === 0 ? (
-        <Typography>No favorites yet.</Typography>
+        <Typography color="white">
+          {userId
+            ? "This user has no favorites."
+            : "You have no favorites yet."}
+        </Typography>
       ) : (
         <Stack spacing={3}>
-          {favorites.map((fav, index) => (
-            <Card key={index} sx={{ bgcolor: "#222", color: "white" }}>
+          {favorites.map((movie) => (
+            <Card
+              key={`fav-${movie.id}`}
+              sx={{ bgcolor: "#222", color: "white" }}
+            >
               <CardMedia
                 component="img"
-                height="300"
-                image={fav.movie?.posterUrl || "/fallback-poster.jpg"}
-                alt={fav.movie?.title}
+                sx={{ height: 500, width: 400, objectFit: "cover" }}
+                image={movie.posterUrl || "/fallback-poster.jpg"}
+                alt={movie.title}
               />
               <CardContent>
-                <Typography variant="h6">{fav.movie?.title}</Typography>
+                <Typography variant="h6">{movie.title}</Typography>
                 <Typography variant="body2">
-                  {fav.movie?.description || "No description"}...
+                  {movie.description || "No description"}...
                 </Typography>
                 <Stack direction="row" spacing={1} mt={1}>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleRemoveFavorite(fav.movie.id)}
-                  >
-                    Remove
-                  </Button>
+                  {!userId && (
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleRemoveFavorite(movie.id)}
+                    >
+                      Remove
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => navigate(`/movie/${fav.movie.id}`)}
+                    onClick={() => navigate(`/movie/${movie.id}`)}
                   >
                     View
                   </Button>

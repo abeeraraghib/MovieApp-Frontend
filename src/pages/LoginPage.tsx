@@ -14,18 +14,34 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const res = await loginUser(email, password);
 
       if (res.access_token) {
+        // Save token, role, and userId
         localStorage.setItem("token", res.access_token);
-        if (res.user?.role) {
-          localStorage.setItem("role", res.user.role);
+
+        if (res.role) {
+          localStorage.setItem("role", res.role);
         }
-        alert("Login successful!");
-        navigate("/");
+
+        if (res.userId) {
+          localStorage.setItem("userId", res.userId);
+
+          alert("Login successful!");
+
+          // Redirect based on role
+          if (res.role === "ADMIN") {
+            navigate("/admin");
+          } else {
+            navigate(`/home/${res.userId}`);
+          }
+        } else {
+          alert("User ID missing from response!");
+        }
       } else {
         alert(res.message || "Login failed");
       }

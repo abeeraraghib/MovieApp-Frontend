@@ -16,9 +16,16 @@ import {
   ListItemText,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link, useNavigate } from "react-router-dom";
-import { fetchMovies } from "../api";
+import {
+  fetchMovies,
+  fetchMoviesByGenre,
+  addFavorite,
+  fetchFavoritesByUser,
+  removeFavorite,
+} from "../api";
 
 interface Movie {
   id: number;
@@ -30,12 +37,17 @@ interface Movie {
 const HomePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
-  const [query, setQuery] = useState("");
   const [favorites, setFavorites] = useState<Movie[]>([]);
+  const [query, setQuery] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showGenres, setShowGenres] = useState(false);
+  const [showFavs, setShowFavs] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState<string>("");
+  const [isFiltering, setIsFiltering] = useState(false);
 
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     fetchMovies()
@@ -46,6 +58,17 @@ const HomePage: React.FC = () => {
       });
   }, []);
 
+  useEffect(() => {
+    if (userId) {
+      fetchFavoritesByUser(Number(userId))
+        .then((res) => {
+          const normalized = res.map((f: any) => (f.movie ? f.movie : f));
+          setFavorites(normalized);
+        })
+        .catch((err) => console.error("Failed to fetch favorites:", err));
+    }
+  }, [userId]);
+
   const handleSearch = () => {
     if (!query.trim()) return;
     const results = movies.filter((m) =>
@@ -54,22 +77,51 @@ const HomePage: React.FC = () => {
     setSearchResults(results);
   };
 
-  const addToFavorites = (movie: Movie) => {
+  const handleGenre = async (genre: string) => {
+    setSelectedGenre(genre);
+    setIsFiltering(true); // we are in filter mode now
+
+    if (!genre) {
+      const allMovies = await fetchMovies();
+      setSearchResults(allMovies);
+      setIsFiltering(false); // reset filter state
+    } else {
+      const data = await fetchMoviesByGenre(genre);
+      setSearchResults(data);
+    }
+  };
+
+  const handleAddToFavorites = async (movie: Movie) => {
+    if (!userId) {
+      alert("Please log in to add favorites");
+      return;
+    }
     if (favorites.find((fav) => fav.id === movie.id)) {
       alert("Already in favorites!");
       return;
     }
-    setFavorites([...favorites, movie]);
-    alert(`${movie.title} added to favorites!`);
+    try {
+      await addFavorite(Number(userId), movie.id);
+      setFavorites([...favorites, movie]);
+      alert(`${movie.title} added to favorites!`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add favorite.");
+    }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    localStorage.removeItem("userId");
     navigate("/login");
   };
 
-  const displayedMovies = searchResults.length > 0 ? searchResults : movies;
+  const displayedMovies = showFavs
+    ? favorites
+    : isFiltering
+    ? searchResults
+    : movies;
 
   return (
     <>
@@ -92,7 +144,6 @@ const HomePage: React.FC = () => {
           >
             MovieFlix
           </Typography>
-
           <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
             <MenuIcon sx={{ color: "white" }} />
           </IconButton>
@@ -126,14 +177,9 @@ const HomePage: React.FC = () => {
             </>
           )}
           {role === "USER" && (
-            <>
-              <ListItemButton onClick={() => navigate("/favorites")}>
-                <ListItemText primary="Favorites" />
-              </ListItemButton>
-              <ListItemButton onClick={handleLogout}>
-                <ListItemText primary="Logout" />
-              </ListItemButton>
-            </>
+            <ListItemButton onClick={handleLogout}>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
           )}
         </List>
       </Drawer>
@@ -169,58 +215,209 @@ const HomePage: React.FC = () => {
           </Button>
         </Box>
 
-        <Box display="flex" flexWrap="wrap" gap={2}>
-          {displayedMovies.map((movie) => (
-            <Link
-              key={movie.id}
-              to={`/movie/${movie.id}`}
-              style={{ textDecoration: "none" }}
+        <Box mb={3}>
+          {role === "USER" && (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => setShowFavs(!showFavs)}
             >
-              <Card
-                sx={{
-                  width: 200,
-                  cursor: "pointer",
-                  opacity: 0.9,
-                  transition:
-                    "transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out",
-                  "&:hover": {
-                    transform: "scale(1.08)",
-                    boxShadow: "0 12px 24px rgba(0,0,0,0.3)",
-                    opacity: 1,
-                  },
-                }}
+              {showFavs ? "Hide Favorites" : "My Favorites"}
+            </Button>
+          )}
+          <Button
+            onClick={() => setShowGenres(!showGenres)}
+            variant="contained"
+            color="error"
+            sx={{ ml: 2 }}
+          >
+            Genres
+          </Button>
+          {showGenres && (
+            <Box display="flex" flexDirection="column" mt={1}>
+              {["Action", "Horror", "Comedy", "Fantasy", "Adventure"].map(
+                (genre) => (
+                  <Button
+                    key={genre}
+                    onClick={() => handleGenre(genre)}
+                    sx={{
+                      justifyContent: "flex-start",
+                      backgroundColor:
+                        selectedGenre === genre ? "red" : "transparent",
+                      color: selectedGenre === genre ? "white" : "white",
+                      "&:hover": {
+                        backgroundColor:
+                          selectedGenre === genre
+                            ? "darkred"
+                            : "rgba(255,255,255,0.1)",
+                      },
+                    }}
+                  >
+                    {genre}
+                  </Button>
+                )
+              )}
+              <Button
+                onClick={() => handleGenre("")}
+                variant={selectedGenre === "" ? "contained" : "outlined"}
+                color="error"
               >
-                <CardMedia
-                  component="img"
-                  height="300"
-                  image={movie.posterUrl || "/fallback-poster.jpg"}
-                  alt={movie.title}
-                />
-                <IconButton
+                Clear
+              </Button>
+            </Box>
+          )}
+        </Box>
+
+        {showFavs && favorites.length > 0 && (
+          <Box mb={4}>
+            <Typography variant="h6" sx={{ color: "white", mb: 2 }}>
+              My Favorites
+            </Typography>
+            <Box display="flex" flexWrap="wrap" gap={2}>
+              {favorites.map((movie) => (
+                <Card
+                  key={movie.id}
                   sx={{
-                    position: "absolute",
-                    top: 10,
-                    right: 10,
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    "&:hover": { backgroundColor: "rgba(255,255,255,0.4)" },
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    addToFavorites(movie);
+                    width: 140,
+                    position: "relative",
+                    cursor: "pointer",
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                      boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
+                    },
                   }}
                 >
-                  <FavoriteBorderIcon sx={{ color: "white" }} />
-                </IconButton>
-                <Typography
-                  variant="subtitle1"
-                  sx={{ p: 1, background: "black", color: "white" }}
+                  <CardMedia
+                    component="img"
+                    height="180"
+                    image={movie.posterUrl || "/fallback-poster.jpg"}
+                    alt={movie.title}
+                  />
+
+                  <IconButton
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      backgroundColor: "rgba(255,255,255,0.2)",
+                      "&:hover": { backgroundColor: "rgba(255,255,255,0.4)" },
+                    }}
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      try {
+                        await removeFavorite(Number(userId), movie.id);
+                        setFavorites(
+                          favorites.filter((fav) => fav.id !== movie.id)
+                        );
+                        alert(`${movie.title} removed from favorites`);
+                      } catch (err) {
+                        console.error(err);
+                        alert("Failed to remove favorite.");
+                      }
+                    }}
+                  >
+                    <DeleteIcon sx={{ color: "red" }} />
+                  </IconButton>
+
+                  <Typography
+                    variant="body2"
+                    sx={{ p: 1, background: "black", color: "white" }}
+                  >
+                    {movie.title}
+                  </Typography>
+                </Card>
+              ))}
+            </Box>
+          </Box>
+        )}
+
+        <Box display="flex" flexWrap="wrap" gap={2}>
+          {displayedMovies.length === 0 ? (
+            <Typography color="white" variant="h6">
+              No movies found
+            </Typography>
+          ) : (
+            displayedMovies.map((movie) => {
+              const isFavorite = favorites.some((fav) => fav.id === movie.id);
+
+              return (
+                <Link
+                  key={movie.id}
+                  to={`/movie/${movie.id}`}
+                  style={{ textDecoration: "none" }}
                 >
-                  {movie.title} ({movie.releaseYear})
-                </Typography>
-              </Card>
-            </Link>
-          ))}
+                  <Card
+                    sx={{
+                      width: 200,
+                      cursor: "pointer",
+                      opacity: 0.9,
+                      transition:
+                        "transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out",
+                      "&:hover": {
+                        transform: "scale(1.08)",
+                        boxShadow: "0 12px 24px rgba(0,0,0,0.3)",
+                        opacity: 1,
+                      },
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      height="300"
+                      image={movie.posterUrl || "/fallback-poster.jpg"}
+                      alt={movie.title}
+                    />
+
+                    <IconButton
+                      sx={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                        backgroundColor: "rgba(255,255,255,0.2)",
+                        "&:hover": { backgroundColor: "rgba(255,255,255,0.4)" },
+                      }}
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!userId) {
+                          alert("Please log in first!");
+                          return;
+                        }
+
+                        if (isFavorite) {
+                          try {
+                            await removeFavorite(Number(userId), movie.id);
+                            setFavorites(
+                              favorites.filter((fav) => fav.id !== movie.id)
+                            );
+                            alert(`${movie.title} removed from favorites`);
+                          } catch (err) {
+                            console.error(err);
+                            alert("Failed to remove favorite.");
+                          }
+                        } else {
+                          handleAddToFavorites(movie);
+                        }
+                      }}
+                    >
+                      {isFavorite ? (
+                        <DeleteIcon sx={{ color: "red" }} />
+                      ) : (
+                        <FavoriteBorderIcon sx={{ color: "white" }} />
+                      )}
+                    </IconButton>
+
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ p: 1, background: "black", color: "white" }}
+                    >
+                      {movie.title} ({movie.releaseYear})
+                    </Typography>
+                  </Card>
+                </Link>
+              );
+            })
+          )}
         </Box>
       </Container>
     </>
