@@ -19,23 +19,16 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await loginUser(email, password);
-
       if (res.access_token) {
-        // Save token, role, and userId
         localStorage.setItem("token", res.access_token);
-
         if (res.role) {
           localStorage.setItem("role", res.role);
         }
-
         if (res.userId) {
           localStorage.setItem("userId", res.userId);
-
           alert("Login successful!");
-
-          // Redirect based on role
           if (res.role === "ADMIN") {
-            navigate("/admin");
+            navigate(`/home/${res.userId}`);
           } else {
             navigate(`/home/${res.userId}`);
           }

@@ -61,10 +61,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     if (userId) {
       fetchFavoritesByUser(Number(userId))
-        .then((res) => {
-          const normalized = res.map((f: any) => (f.movie ? f.movie : f));
-          setFavorites(normalized);
-        })
+        .then(setFavorites)
         .catch((err) => console.error("Failed to fetch favorites:", err));
     }
   }, [userId]);
@@ -79,12 +76,11 @@ const HomePage: React.FC = () => {
 
   const handleGenre = async (genre: string) => {
     setSelectedGenre(genre);
-    setIsFiltering(true); // we are in filter mode now
-
+    setIsFiltering(true);
     if (!genre) {
       const allMovies = await fetchMovies();
       setSearchResults(allMovies);
-      setIsFiltering(false); // reset filter state
+      setIsFiltering(false);
     } else {
       const data = await fetchMoviesByGenre(genre);
       setSearchResults(data);
@@ -117,11 +113,7 @@ const HomePage: React.FC = () => {
     navigate("/login");
   };
 
-  const displayedMovies = showFavs
-    ? favorites
-    : isFiltering
-    ? searchResults
-    : movies;
+  const displayedMovies = isFiltering ? searchResults : movies;
 
   return (
     <>
@@ -219,7 +211,7 @@ const HomePage: React.FC = () => {
           {role === "USER" && (
             <Button
               variant="contained"
-              color="secondary"
+              color="error"
               onClick={() => setShowFavs(!showFavs)}
             >
               {showFavs ? "Hide Favorites" : "My Favorites"}
@@ -279,6 +271,7 @@ const HomePage: React.FC = () => {
                   key={movie.id}
                   sx={{
                     width: 140,
+                    height: 210,
                     position: "relative",
                     cursor: "pointer",
                     "&:hover": {

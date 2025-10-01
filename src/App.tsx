@@ -5,7 +5,7 @@ import { RegisterPage } from "./pages/RegisterPage";
 import MovieDetailsPage from "./pages/MovieDetails";
 import AdminPage from "./pages/Admin";
 import MoviesPage from "./pages/MoviesEditAdmin";
-import FavoritesPage from "./pages/FavoritePage";
+import FavoritesPageAdmin from "./pages/FavoritePageAdmin";
 function App() {
   return (
     <Routes>
@@ -16,7 +16,7 @@ function App() {
       <Route path="/movie/:id" element={<MovieDetailsPage />} />
       <Route path="/movies" element={<MoviesPage />} />
       <Route path="/admin" element={<AdminPage />} />
-      <Route path="/admin/favorites/:userId" element={<FavoritesPage />} />
+      <Route path="/favorites/:userId" element={<FavoritesPageAdmin />} />
     </Routes>
   );
 }

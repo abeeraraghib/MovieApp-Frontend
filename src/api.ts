@@ -105,13 +105,14 @@ export const deleteUser = async (id: number) => {
 };
 
 // ---------- Favorites ----------
+
 export const fetchFavoritesByUser = async (userId: number) => {
   const token = localStorage.getItem("token");
   const res = await fetch(`${BASE_URL}/favorites/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error("Failed to fetch favorites");
-  return res.json();
+  return res.json(); 
 };
 
 export const addFavorite = async (userId: number, movieId: number) => {
@@ -134,8 +135,7 @@ export const removeFavorite = async (userId: number, movieId: number) => {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+      Authorization: `Bearer ${token}` },
     body: JSON.stringify({ userId, movieId }),
   });
   if (!res.ok) throw new Error("Failed to remove favorite");
