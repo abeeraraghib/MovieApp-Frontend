@@ -24,7 +24,7 @@ A full-stack movie application with **Admin** and **User** interfaces where user
 
 ## 🛠️ Technologies Used
 - **Frontend:** React.js, Material-UI (MUI), TypeScript
-- **Backend:** REST API (assumed, can mention Express, NestJS, etc.)
+- **Backend:** REST API (NestJS)
 - **Routing:** React Router
 - **State Management:** React Hooks (`useState`, `useEffect`)
 - **API Calls:** `fetch` / custom API functions
