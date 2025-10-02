@@ -1,4 +1,4 @@
-## 🎬 Movie App
+## 🎬 Movie App Frontend
 
 A full-stack movie application with **Admin** and **User** interfaces where users can search, browse, and manage favorite movies. Admins can manage movies and users.
 
@@ -45,7 +45,7 @@ http://localhost:5173
 
 ## Screenshots
 
-Admin Dashboard:
+**Admin Dashboard:**
 
 <img width="1915" height="918" alt="image" src="https://github.com/user-attachments/assets/c86dbf16-a372-4f1f-b5fc-c5861712800e" />
 
@@ -53,7 +53,7 @@ Admin Dashboard:
 
 <img width="1909" height="956" alt="image" src="https://github.com/user-attachments/assets/cc028f7b-fcbe-4844-b091-073430ffc2f0" />
 
-User Dashboard:
+**User Dashboard:**
 
 <img width="1920" height="964" alt="image" src="https://github.com/user-attachments/assets/82658100-10c1-4440-a252-396a4f7be524" />
 
@@ -64,33 +64,31 @@ User Dashboard:
 ---
 
 ## Usage
-User:
 
-Search for a movie or filter by genre.
+**User:**
 
-Click Add to Favorites to save it.
+- Search for a movie or filter by genre.
+- Click Add to Favorites to save it.
+- Remove from favorites by clicking Remove.
 
-Remove from favorites by clicking Remove.
+**Admin:**
 
-Admin:
-
-Switch between Movies and Users tab.
-
-Add a new movie using the form.
-
-Edit or delete movies from the list.
-
-Update user roles and view their favorites.
+- Switch between Movies and Users tab.
+- Add a new movie using the form.
+- Edit or delete movies from the list.
+- Update user roles and view their favorites.
 
 ---
 
 ## 📌Notes
 
-Ensure your backend API is running for full functionality.
+- Ensure your backend API is running for full functionality.
+- All data is fetched dynamically via API calls.
+- Designed to be fully responsive across devices.
 
-All data is fetched dynamically via API calls.
+## 💻 Author
 
-Designed to be fully responsive across devices.
+Abeera Raghib – https://github.com/abeeraraghib/
 
 
 
