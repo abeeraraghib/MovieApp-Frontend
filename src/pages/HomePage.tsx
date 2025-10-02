@@ -14,6 +14,10 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -44,6 +48,7 @@ const HomePage: React.FC = () => {
   const [showFavs, setShowFavs] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState<string>("");
   const [isFiltering, setIsFiltering] = useState(false);
+  const [loginPopup, setLoginPopup] = useState(false);
 
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
@@ -72,6 +77,7 @@ const HomePage: React.FC = () => {
       m.title.toLowerCase().includes(query.toLowerCase())
     );
     setSearchResults(results);
+    setIsFiltering(true);
   };
 
   const handleGenre = async (genre: string) => {
@@ -113,15 +119,17 @@ const HomePage: React.FC = () => {
     navigate("/login");
   };
 
+  useEffect(() => {
+    if (!userId || !role) {
+      setLoginPopup(true);
+    }
+  }, [userId, role]);
+
   const displayedMovies = isFiltering ? searchResults : movies;
 
   return (
     <>
-      <AppBar
-        position="sticky"
-        sx={{ backgroundColor: "black", mb: 3 }}
-        elevation={0}
-      >
+      <AppBar position="sticky" sx={{ backgroundColor: "black", mb: 3 }}>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Typography
             variant="h5"
@@ -186,11 +194,6 @@ const HomePage: React.FC = () => {
             onChange={(e) => setQuery(e.target.value)}
             InputProps={{ style: { color: "white" } }}
             InputLabelProps={{ style: { color: "white" } }}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "white" },
-              },
-            }}
           />
           <Button
             variant="contained"
@@ -295,9 +298,7 @@ const HomePage: React.FC = () => {
                       backgroundColor: "rgba(255,255,255,0.2)",
                       "&:hover": { backgroundColor: "rgba(255,255,255,0.4)" },
                     }}
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
+                    onClick={async () => {
                       try {
                         await removeFavorite(Number(userId), movie.id);
                         setFavorites(
@@ -369,9 +370,7 @@ const HomePage: React.FC = () => {
                         backgroundColor: "rgba(255,255,255,0.2)",
                         "&:hover": { backgroundColor: "rgba(255,255,255,0.4)" },
                       }}
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                      onClick={async () => {
                         if (!userId) {
                           alert("Please log in first!");
                           return;
@@ -412,6 +411,30 @@ const HomePage: React.FC = () => {
             })
           )}
         </Box>
+        <Dialog
+          open={loginPopup}
+          onClose={() => {
+            setLoginPopup(false);
+            navigate("/login");
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: "bold" }}>Login Required</DialogTitle>
+          <DialogContent>
+            <Typography>You need to log in first to view this page.</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setLoginPopup(false);
+                navigate("/login");
+              }}
+              color="error"
+              variant="contained"
+            >
+              Go to Login
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </>
   );

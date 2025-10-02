@@ -59,7 +59,7 @@ const MovieDetails: React.FC = () => {
       >
         <CardMedia
           component="img"
-          sx={{ width: { xs: "100%", md: 380 } }}
+          sx={{ width: { xs: "100%", md: 350 } }}
           image={movie.posterUrl || "/fallback-poster.jpg"}
           alt={movie.title}
         />

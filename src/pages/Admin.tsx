@@ -270,52 +270,58 @@ const AdminPage: React.FC = () => {
             <CircularProgress />
           ) : (
             <Stack spacing={2}>
-              {movies.map((movie) => (
-                <Card
-                  key={movie.id}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    bgcolor: "#1e1e1e",
-                    color: "white",
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    image={movie.posterUrl || "/fallback-poster.jpg"}
-                    alt={movie.title}
-                    sx={{ width: 100, borderRadius: 2 }}
-                  />
-                  <CardContent sx={{ flex: 1 }}>
-                    <Typography variant="h6">{movie.title}</Typography>
-                    <Typography variant="body2">
-                      Genre: {movie.genre || "N/A"}
-                    </Typography>
-                    <Typography variant="body2">
-                      Release: {movie.releaseYear}
-                    </Typography>
-                    <Typography variant="body2">
-                      {movie.description || "No description"}
-                    </Typography>
-                    <Stack direction="row" spacing={1} mt={1}>
-                      <Button
-                        variant="outlined"
-                        color="info"
-                        onClick={() => handleEditMovie(movie)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => handleDeleteClick(movie.id, "movie")}
-                      >
-                        Delete
-                      </Button>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              ))}
+              {[...movies]
+                .sort((a, b) =>
+                  a.id === editMovieId ? -1 : b.id === editMovieId ? 1 : 0
+                )
+                .map((movie) => (
+                  <Card
+                    key={movie.id}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      bgcolor: movie.id === editMovieId ? "#333" : "#1e1e1e",
+                      color: "white",
+                      border:
+                        movie.id === editMovieId ? "2px solid #f50057" : "none",
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      image={movie.posterUrl || "/fallback-poster.jpg"}
+                      alt={movie.title}
+                      sx={{ height: 200, width: 140, borderRadius: 2 }}
+                    />
+                    <CardContent sx={{ flex: 1 }}>
+                      <Typography variant="h6">{movie.title}</Typography>
+                      <Typography variant="body2">
+                        Genre: {movie.genre || "N/A"}
+                      </Typography>
+                      <Typography variant="body2">
+                        Release: {movie.releaseYear}
+                      </Typography>
+                      <Typography variant="body2">
+                        {movie.description || "No description"}
+                      </Typography>
+                      <Stack direction="row" spacing={1} mt={1}>
+                        <Button
+                          variant="outlined"
+                          color="info"
+                          onClick={() => handleEditMovie(movie)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleDeleteClick(movie.id, "movie")}
+                        >
+                          Delete
+                        </Button>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                ))}
             </Stack>
           )}
         </Box>
@@ -323,7 +329,10 @@ const AdminPage: React.FC = () => {
 
       {tab === 1 && (
         <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>
+          <Typography
+            variant="h6"
+            sx={{ mb: 2, fontSize: { xs: "1rem", sm: "1.25rem" } }}
+          >
             Registered Users
           </Typography>
           <Divider sx={{ mb: 2, bgcolor: "white" }} />
@@ -331,38 +340,67 @@ const AdminPage: React.FC = () => {
             {users.map((user) => (
               <ListItem
                 key={user.id}
-                secondaryAction={
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      variant="outlined"
-                      color="info"
-                      onClick={() => handleUpdateUser(user)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleDeleteClick(user.id, "user")}
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      onClick={() => handleViewUserFavorites(user.id)}
-                    >
-                      Favorites
-                    </Button>
-                  </Stack>
-                }
+                sx={{
+                  flexDirection: { xs: "column", sm: "row" },
+                  alignItems: { xs: "flex-start", sm: "center" },
+                  mb: 2,
+                  bgcolor: "#1e1e1e",
+                  borderRadius: 2,
+                  p: 2,
+                }}
               >
                 <ListItemText
                   primary={`${user.name} (${user.email})`}
                   secondary={`Role: ${user.role}`}
-                  primaryTypographyProps={{ style: { color: "white" } }}
-                  secondaryTypographyProps={{ style: { color: "gray" } }}
+                  primaryTypographyProps={{
+                    sx: {
+                      color: "white",
+                      fontSize: { xs: "0.9rem", sm: "1rem" },
+                      wordBreak: "break-word",
+                    },
+                  }}
+                  secondaryTypographyProps={{
+                    sx: {
+                      color: "gray",
+                      fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                      wordBreak: "break-word",
+                    },
+                  }}
                 />
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1}
+                  mt={{ xs: 1, sm: 0 }}
+                  sx={{ width: { xs: "100%", sm: "auto" } }}
+                >
+                  <Button
+                    variant="outlined"
+                    color="info"
+                    size="small"
+                    sx={{ width: { xs: "100%", sm: "auto" } }}
+                    onClick={() => handleUpdateUser(user)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    sx={{ width: { xs: "100%", sm: "auto" } }}
+                    onClick={() => handleDeleteClick(user.id, "user")}
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    size="small"
+                    sx={{ width: { xs: "100%", sm: "auto" } }}
+                    onClick={() => handleViewUserFavorites(user.id)}
+                  >
+                    Favorites
+                  </Button>
+                </Stack>
               </ListItem>
             ))}
           </List>

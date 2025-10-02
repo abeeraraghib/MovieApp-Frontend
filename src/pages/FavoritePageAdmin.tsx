@@ -65,25 +65,35 @@ export default function FavoritesPageAdmin() {
       {favorites.length === 0 ? (
         <Typography color="white">This user has no favorites.</Typography>
       ) : (
-        <Stack spacing={3}>
+        <Stack spacing={2}>
           {favorites.map((movie) => (
             <Card
               key={`fav-${movie.id}`}
               sx={{
-                width: 200,
+                display: "flex",
                 bgcolor: "#222",
                 color: "white",
+                cursor: "pointer",
+                "&:hover": {
+                  transform: "scale(1.02)",
+                  boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
+                  transition: "0.3s",
+                },
               }}
             >
               <CardMedia
                 component="img"
-                sx={{ height: 300, objectFit: "cover" }}
+                sx={{
+                  width: { xs: 120, sm: 150, md: 180 },
+                  height: { xs: 180, sm: 220, md: 250 },
+                  objectFit: "cover",
+                }}
                 image={movie.posterUrl || "/fallback-poster.jpg"}
                 alt={movie.title}
               />
-              <CardContent>
+              <CardContent sx={{ flex: 1 }}>
                 <Typography variant="h6">{movie.title}</Typography>
-                <Typography variant="body2" sx={{ color: "gray" }}>
+                <Typography variant="body2" sx={{ color: "gray", mt: 1 }}>
                   {movie.description || "No description"}
                 </Typography>
               </CardContent>
