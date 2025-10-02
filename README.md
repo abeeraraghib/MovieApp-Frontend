@@ -1,69 +1,101 @@
-# React + TypeScript + Vite
+## 🎬 Movie App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack movie application with **Admin** and **User** interfaces where users can search, browse, and manage favorite movies. Admins can manage movies and users.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🌟 Features
 
-## Expanding the ESLint configuration
+### **User Side**
+- Search movies by **title** or **genre**
+- Add movies to **favorites**
+- Remove movies from **favorites**
+- Responsive design for all screen sizes
+- View movie details
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### **Admin Side**
+- Add, edit, and delete movies
+- View registered users
+- Update user roles (**USER** / **ADMIN**)
+- View users’ favorite movies
+- Responsive layout for both movies and users
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 🛠️ Technologies Used
+- **Frontend:** React.js, Material-UI (MUI), TypeScript
+- **Backend:** REST API (assumed, can mention Express, NestJS, etc.)
+- **Routing:** React Router
+- **State Management:** React Hooks (`useState`, `useEffect`)
+- **API Calls:** `fetch` / custom API functions
+- **Styling:** MUI theming and responsive design
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚀 Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Install Dependencies
+npm install
+
+## Server
+npm run dev
+http://localhost:5173
+
+## Screenshots
+
+Admin Dashboard:
+
+<img width="1915" height="918" alt="image" src="https://github.com/user-attachments/assets/c86dbf16-a372-4f1f-b5fc-c5861712800e" />
+
+<img width="1898" height="927" alt="image" src="https://github.com/user-attachments/assets/a60fc0b3-d951-43e1-a5ea-5d660bfb5794" />
+
+<img width="1909" height="956" alt="image" src="https://github.com/user-attachments/assets/cc028f7b-fcbe-4844-b091-073430ffc2f0" />
+
+User Dashboard:
+
+<img width="1920" height="964" alt="image" src="https://github.com/user-attachments/assets/82658100-10c1-4440-a252-396a4f7be524" />
+
+<img width="1920" height="941" alt="image" src="https://github.com/user-attachments/assets/ccfe805d-8d27-44a3-8110-f353ca52b68e" />
+
+<img width="1920" height="906" alt="image" src="https://github.com/user-attachments/assets/9f590cb3-dfd3-4a6f-949f-71a7575cb29b" />
+
+---
+
+## Usage
+User:
+
+Search for a movie or filter by genre.
+
+Click Add to Favorites to save it.
+
+Remove from favorites by clicking Remove.
+
+Admin:
+
+Switch between Movies and Users tab.
+
+Add a new movie using the form.
+
+Edit or delete movies from the list.
+
+Update user roles and view their favorites.
+
+---
+
+## 📌Notes
+
+Ensure your backend API is running for full functionality.
+
+All data is fetched dynamically via API calls.
+
+Designed to be fully responsive across devices.
+
+
+
+
+
+
+
+
