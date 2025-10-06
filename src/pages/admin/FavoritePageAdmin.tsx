@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchFavoritesByUser } from "../api";
+import { fetchFavoritesByUser } from "../../api";
 
 interface Movie {
   id: number;

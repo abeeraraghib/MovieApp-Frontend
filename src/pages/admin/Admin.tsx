@@ -31,7 +31,7 @@ import {
   fetchUsers,
   updateUser,
   deleteUser,
-} from "../api";
+} from "../../api";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 interface Movie {
@@ -106,24 +106,27 @@ const AdminPage: React.FC = () => {
       posterUrl: poster,
       description,
       genre,
-      releaseYear,
+      releaseYear: Number(releaseYear),
     };
 
     try {
       if (editMovieId) {
         await updateMovie(editMovieId, movieData);
         alert("Movie updated successfully!");
+        setMovies(
+          movies.map((m) => (m.id === editMovieId ? { ...m, ...movieData } : m))
+        );
         setEditMovieId(null);
       } else {
-        await addMovie(movieData);
+        const newMovie = await addMovie(movieData);
         alert("Movie added successfully!");
+        setMovies([...movies, newMovie]);
       }
       setTitle("");
       setPoster("");
       setGenre("");
       setDescription("");
       setReleaseYear("");
-      loadMovies();
     } catch (err) {
       console.error(err);
       alert("Failed to save movie");
@@ -203,7 +206,7 @@ const AdminPage: React.FC = () => {
         centered
         sx={{ mb: 3, color: "white" }}
         textColor="inherit"
-        indicatorColor="secondary"
+        indicatorColor="primary"
       >
         <Tab label="Movies" />
         <Tab label="Users" />

@@ -29,7 +29,7 @@ import {
   addFavorite,
   fetchFavoritesByUser,
   removeFavorite,
-} from "../api";
+} from "../../api";
 
 interface Movie {
   id: number;
