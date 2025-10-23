@@ -1,4 +1,4 @@
-const BASE_URL = "https://movieapp-backend-production-ea25.up.railway.app";
+const BASE_URL = "http://localhost:5000";
 
 
 // ---------- Auth ----------
