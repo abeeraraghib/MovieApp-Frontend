@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://movieapp-backend-production-ea25.up.railway.app";
+
 
 // ---------- Auth ----------
 export const registerUser = async (name: string, email: string, password: string) => {
